@@ -3,6 +3,7 @@ FROM python:3.5-alpine
 
 RUN mkdir -p /opt/app/src
 COPY src/main/python/*.py /opt/app/src/
+COPY docker/key.pem /opt/app/key.pem
 #COPY src/main/resources/* /opt/app/
 
 #COPY src/requirements.txt /tmp/requirements.txt

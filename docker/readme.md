@@ -7,6 +7,9 @@ sudo chmod +x /usr/local/bin/docker-compose
 - create config file
 docker secret create imap-2-http-client1.cfg file example/imap-2-http-client1.cfg
 
+
+openssl genrsa -out key.pem 2048
+
 - start connector:
 `docker-compose up -d`
 
