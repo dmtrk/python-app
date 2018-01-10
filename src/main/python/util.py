@@ -6,9 +6,9 @@ def findConfigFile(args):
     if len(args) > 1:
         return args[1]
     else:
-        for file in os.listdir("/"):
+        for file in os.listdir("/run/secrets/"):
             if file.endswith(".cfg"):
-                return "/"+file
+                return "/run/secrets/"+file
     return "/config.cfg"
 
 
