@@ -1,0 +1,10 @@
+version: '3.1'
+
+services:
+
+  connector:
+    build:
+      context: ../
+      dockerfile: docker/Dockerfile
+    image: imap-2-http-connector
+    container_name: imap-2-http-connector
