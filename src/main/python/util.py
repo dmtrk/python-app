@@ -8,7 +8,7 @@ def findConfigFile(args):
     else:
         for file in os.listdir("/"):
             if file.endswith(".cfg"):
-                return file
+                return "/"+file
     return "/config.cfg"
 
 

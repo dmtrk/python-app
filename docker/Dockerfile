@@ -11,4 +11,3 @@ COPY docker/key.pem /opt/app/key.pem
 
 WORKDIR /opt/app
 ENTRYPOINT ["/usr/local/bin/python", "-u", "/opt/app/src/main.py"]
-CMD ["/config.cfg"]
