@@ -33,3 +33,12 @@ def getInt(dict, key, default_value) -> str:
     except Exception:
         print(traceback.format_exc())
     return default_value
+
+def getBool(dict, key, default_value) -> str:
+    try:
+        value = (dict[key] if key in dict else "").strip()
+        return value.upper()=="TRUE" if len(value) > 0 else default_value
+    except Exception:
+        print(traceback.format_exc())
+    return default_value
+

@@ -17,25 +17,36 @@ def main():
         poll_interval = getInt(properties, "imap.poll.interval", 60)
         host = getString(properties, "imap.host", "127.0.0.1")
         port = getInt(properties, "imap.port", 143)
-        u = getString(properties, "imap.username", "")
-        p = getString(properties, "imap.password", "")
-        if len(u) == 0 or len(p) == 0:
+        user = getString(properties, "imap.username", "")
+        password = getString(properties, "imap.password", "")
+        usessl = getBool(properties, "imap.usessl", True)
+        keyfile = getString(properties, "imap.keyfile", "key.pem")
+        certfile= getString(properties, "imap.certfile", "cert.pem")
+        if len(user) == 0 or len(password) == 0:
             raise Exception("'imap.username' and 'imap.password' are required")
 
         while 1 == 1:
             try:
                 print("Hello, World! " + datetime.datetime.utcnow().isoformat())
+
                 if imap_client is None:
-                    imap_client = imaplib.IMAP4(host, port)  # imap_client = IMAP4_SSL(host)
-                    imap_client.login(u, p)
+                    print("Connecting to '" + host + ":" + str(port) + "' as '"+user+"'")
+                    imap_client = imaplib.IMAP4_SSL(host,port,keyfile,certfile) if usessl else imaplib.IMAP4(host, port)
+                    imap_client.login(user, password)
                 else:
                     imap_client.noop()
+
                 check_mail(imap_client)
 
             except ConnectionRefusedError:
-                print("Unable to connect to '" + host + ":" + port + "'")
+                print("Unable to connect to '" + host + ":" + str(port) + "' as '"+user+"'")
+                close(imap_client)
+                imap_client=None
             except Exception:
                 print(traceback.format_exc())
+                close(imap_client)
+                imap_client=None
+            # sleep
             time.sleep(poll_interval)
 
     except Exception:
