@@ -3,7 +3,8 @@ def parseProperties(stream) -> dict:
     try:
         for line in stream.readlines():
             keyval = line.split("=")
-            p[keyval[0].strip()] = keyval[1].strip()
+            if len(keyval)>0:
+                p[keyval[0].strip()] = keyval[1].strip()
     except IOError as e:
         raise
     return p
