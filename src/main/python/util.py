@@ -31,7 +31,7 @@ def parseProperties(stream) -> dict:
     return p
 
 
-def getString(dict, key, default_value) -> str:
+def getStr(dict, key, default_value) -> str:
     value = (dict[key] if key in dict else "").strip()
     return value if len(value) > 0 else default_value
 
