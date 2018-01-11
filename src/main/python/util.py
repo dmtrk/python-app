@@ -58,3 +58,11 @@ def print_ip():
     p = subprocess.Popen(["netstat", "-nr"], stdout=subprocess.PIPE)
     out = p.stdout.read()
     print(out)
+
+def shutdown(imap_client):
+    print("shutdown() imap_client: " + str(imap_client))
+    try:
+        imap_client.shutdown()
+    except Exception as e:
+        print(e)
+
