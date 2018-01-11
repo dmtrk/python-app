@@ -28,15 +28,19 @@ def main():
 
         while 1 == 1:
             try:
-                print("Hello, World! " + datetime.datetime.utcnow().isoformat())
-
+                #print("Hello, World! " + datetime.datetime.utcnow().isoformat())
                 if imap_client is None:
-                    print("Connecting to '" + host + ":" + str(port) + "' as '"+user+"'")
-                    imap_client = imaplib.IMAP4_SSL(host,port,keyfile,certfile) if usessl else imaplib.IMAP4(host, port)
+                    if usessl:
+                        print("Connecting to 'imaps://" + host + ":" + str(port) + "' as '"+user+"'")
+                        imap_client = imaplib.IMAP4_SSL(host,port,keyfile,certfile)
+                    else:
+                        print("Connecting to 'imap://" + host + ":" + str(port) + "' as '"+user+"'")
+                        imap_client = imaplib.IMAP4(host, port)
+                    # login
                     imap_client.login(user, password)
                 else:
                     imap_client.noop()
-
+                # check_mail
                 check_mail(imap_client)
 
             except ConnectionRefusedError:
