@@ -3,9 +3,9 @@ FROM python:3.5-alpine
 
 COPY src/main/python/*.py /opt/app/src/
 #COPY src/main/resources/* /opt/app/
-COPY docker/resources/tini-static-amd64 /usr/local/bin/tini
-COPY docker/resources/docker-entrypoint.sh /docker-entrypoint.sh
-COPY docker/resources/key.pem /opt/app/key.pem
+COPY docker/resources/* /opt/app/
+COPY docker/scripts/tini-static-amd64 /usr/local/bin/tini
+COPY docker/scripts/docker-entrypoint.sh /docker-entrypoint.sh
 
 RUN chown -R nobody:nobody /opt/app/ && chmod +x /usr/local/bin/tini && chmod +x /docker-entrypoint.sh
 
