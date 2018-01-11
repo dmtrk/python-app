@@ -10,6 +10,7 @@ def main():
     print('Connector arguments:', str(sys.argv))
     imap_client = None
     try:
+        print_ip()
         config_file = findConfigFile(sys.argv)
         print("Loading config_file: '" + config_file + "'")
         properties = parseProperties(open(config_file, "r"))
