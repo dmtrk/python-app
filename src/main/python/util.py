@@ -3,7 +3,8 @@ import traceback
 import subprocess
 
 SECRETS_DIR = "/run/secrets/"
-
+DONE_FOLDER = "Done"
+ERROR_FOLDER= "Error"
 
 def findConfigFile(args):
     if len(args) > 1:
@@ -62,7 +63,30 @@ def print_ip():
 def shutdown(imap_client):
     print("shutdown() imap_client: " + str(imap_client))
     try:
-        imap_client.shutdown()
+        if imap_client != None:
+            imap_client.logout()
+            imap_client.shutdown()
     except Exception as e:
         print(e)
 
+def select_folder(imap_client, folder):
+    print("select_folder("+folder+"): " + str(imap_client))
+    typ, data = imap_client.select(folder)
+    print('Response code:', typ)
+    if typ == 'OK':
+        imap_client.create(folder+"/"+DONE_FOLDER)
+        imap_client.create(folder+"/"+ERROR_FOLDER)
+    else:
+        raise LookupError("Invalid folder: '"+folder+"'")
+
+def copy_to_done(imap_client, id, folder):
+    print("Copy message "+str(id)+" to '"+folder+"/"+DONE_FOLDER+"'")
+    typ, data = imap_client.uid('copy', id, folder+"/"+DONE_FOLDER)
+    if typ != 'OK':
+        print('Response:' + str(data))
+
+def copy_to_error(imap_client, id, folder):
+    print("Copy message "+str(id)+" to '"+folder+"/"+ERROR_FOLDER+"'")
+    typ, data = imap_client.uid('copy', id, folder+"/"+ERROR_FOLDER)
+    if typ != 'OK':
+        print('Response:' + str(data))
