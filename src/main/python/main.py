@@ -5,8 +5,8 @@ import ssl
 import sys
 import time
 
-from src.main.python.http_util import do_post
-from src.main.python.imap_util import *
+from http_util import do_post
+from imap_util import *
 
 imap_client = None
 
@@ -77,7 +77,8 @@ def check_mail(folder):
 
 # Main logic
 try:
-    print('Connector arguments:', str(sys.argv))
+    print("Python version: "+str(sys.version))
+    print("Connector arguments:'"+str(sys.argv)+"'")
     print_ip()
     config_file = findConfigFile(sys.argv)
     print("Loading config_file: '" + config_file + "'")
