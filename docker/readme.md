@@ -8,7 +8,7 @@ sudo chmod +x /usr/local/bin/docker-compose
 
 ##Running
 - create config file
-docker secret create imap-2-http-client1.cfg file example/imap-2-http-client1.cfg
+docker secret create imap-2-http-client1.cfg file example/client1.cfg
 
 - create ssl key and cert
 openssl req -x509 -newkey rsa:2048 -keyout key.pem -out cert.pem -days 3650 -nodes
