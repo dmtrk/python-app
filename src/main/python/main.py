@@ -1,13 +1,11 @@
 import email
 import email.header
 import imaplib
+import ssl
 import sys
 import time
 
-from util import *
-
-DONE_FOLDER = "Done"
-ERROR_FOLDER = "Error"
+from src.main.python.util import *
 
 imap_client = None
 
@@ -43,45 +41,34 @@ def process_mail(msg):
             # print 'Raw Date:', msg['Date']
 
 
-def create_done_error_folders(folder):
-    if folder.upper() == "INBOX":
-        imap_client.select()
-    else:
-        imap_client.select(folder)
-    # create folders
-    imap_client.create(DONE_FOLDER)
-    imap_client.create(ERROR_FOLDER)
-    typ, data = imap_client.list()
-    print('Response code:', typ)
-    print('Response:' + str(data))
-
-
-def check_mail():
+def check_mail(folder):
     print("check_mail() imap_client: " + str(imap_client))
     try:
+        imap_client.select(folder)
         typ, data = imap_client.uid('search', None, 'UNDELETED')
+        print('Response code:', typ)
         if typ == 'OK':
-            for uid in data[0].split():
-                print("Getting message ", uid)
+            for id in data[0].split():
+                print("Getting message ", id)
                 try:
-                    rv, data = imap_client.fetch(uid, '(RFC822)')
-                    if rv != 'OK':
-                        print("ERROR getting message", uid)
-                        imap_client.copy(uid, ERROR_FOLDER)
-                    else:
+                    typ, data = imap_client.uid('fetch', id, '(RFC822)')
+                    if typ == 'OK':
                         msg = email.message_from_bytes(data[0][1])
                         process_mail(msg)
-                        imap_client.copy(uid, DONE_FOLDER)
+                        copy_to_done(imap_client, id, folder)
+                    else:
+                        print('Response:' + str(data))
+                        raise Exception("ERROR getting message '" + id + "'")
                 except Exception:
                     print(traceback.format_exc())
-                    imap_client.copy(uid, ERROR_FOLDER)
+                    copy_to_error(imap_client, id, folder)
                 # update message status
-                imap_client.store(uid, '+FLAGS', r'\Deleted')
+                imap_client.uid('store', id, '+FLAGS', r'\Deleted')
+            # end for
             # remove messages from folder
             imap_client.expunge()
         else:
             print("No messages found!")
-
     except Exception:
         print(traceback.format_exc())
 
@@ -94,16 +81,16 @@ try:
     print("Loading config_file: '" + config_file + "'")
     properties = parseProperties(open(config_file, "r"))
     # print("p: '"+str(p)+"'")
-    poll_int= getInt(properties, "imap.poll.interval", 60)
-    host    = getStr(properties, "imap.host", "127.0.0.1")
-    port    = getInt(properties, "imap.port", 143)
-    port_ssl= getInt(properties, "imap.port_ssl", 993)
-    user    = getStr(properties, "imap.username", "")
-    password= getStr(properties, "imap.password", "")
-    folder  = getStr(properties, "imap.folder", "INBOX")
-    usessl  = getBool(properties,"imap.usessl", True)
+    poll_int = getInt(properties, "imap.poll.interval", 60)
+    host = getStr(properties, "imap.host", "127.0.0.1")
+    port = getInt(properties, "imap.port", 143)
+    port_ssl = getInt(properties, "imap.port_ssl", 993)
+    user = getStr(properties, "imap.username", "")
+    password = getStr(properties, "imap.password", "")
+    folder = getStr(properties, "imap.folder", "INBOX")
+    usessl = getBool(properties, "imap.usessl", True)
     keyfile = getStr(properties, "imap.keyfile", "key.pem")
-    certfile= getStr(properties, "imap.certfile", "cert.pem")
+    certfile = getStr(properties, "imap.certfile", "cert.pem")
     if len(user) == 0 or len(password) == 0:
         raise Exception("'imap.username' and 'imap.password' are required")
 
@@ -113,17 +100,19 @@ try:
             if imap_client is None:
                 if usessl:
                     print("Connecting to 'imaps://" + host + ":" + str(port_ssl) + "' as '" + user + "'")
-                    imap_client = imaplib.IMAP4_SSL(host, port, keyfile, certfile)
+                    ctx = ssl.create_default_context(ssl.Purpose.SERVER_AUTH)
+                    imap_client = imaplib.IMAP4(host, port)
+                    imap_client.starttls(ctx)
                 else:
                     print("Connecting to 'imap://" + host + ":" + str(port) + "' as '" + user + "'")
                     imap_client = imaplib.IMAP4(host, port)
                 # login
                 imap_client.login(user, password)
-                create_done_error_folders(folder)
+                select_folder(imap_client, folder)
             else:
                 imap_client.noop()
             # check_mail
-            check_mail()
+            check_mail(folder)
         except ConnectionRefusedError:
             print("Unable to connect to '" + host + ":" + str(port) + "' as '" + user + "'")
             shutdown(imap_client)
