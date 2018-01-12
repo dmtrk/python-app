@@ -1,4 +1,4 @@
-FROM python:3.5-alpine
+FROM python:3.6.4-alpine3.7
 # docker build -t imap-2-http-connector -f docker/Dockerfile .
 
 COPY src/main/python/*.py /opt/app/src/
