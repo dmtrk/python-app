@@ -5,7 +5,8 @@ import ssl
 import sys
 import time
 
-from src.main.python.util import *
+from src.main.python.http_util import do_post
+from src.main.python.imap_util import *
 
 imap_client = None
 
@@ -17,12 +18,13 @@ def process_mail(msg):
             continue
         if part.get('Content-Disposition') is None:
             # print part.as_string()
-            continue
-        file_name = part.get_filename()
+            do_post(post_url, part.get_content_maintype())
 
-        if bool(file_name):
-            print("file_name: " + file_name)
-            print("data: " + part.as_string())
+        #file_name = part.get_filename()
+
+        #if bool(file_name):
+            #print("file_name: " + file_name)
+            #print("data: " + part.as_string())
 
             # filePath = os.path.join(detach_dir, 'attachments', fileName)
             # if not os.path.isfile(filePath) :
@@ -91,6 +93,7 @@ try:
     usessl = getBool(properties, "imap.usessl", True)
     keyfile = getStr(properties, "imap.keyfile", "key.pem")
     certfile = getStr(properties, "imap.certfile", "cert.pem")
+    post_url = getStr(properties, "http.post_url", "")
     if len(user) == 0 or len(password) == 0:
         raise Exception("'imap.username' and 'imap.password' are required")
 
