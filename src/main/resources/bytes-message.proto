@@ -1,0 +1,12 @@
+syntax = "proto2";
+
+package proto;
+
+// java related options
+option java_package = "proto";
+option java_outer_classname = "ProtoBuf";
+
+message BytesMessage {
+  repeated string header = 1;
+  optional bytes data = 2;
+}

@@ -15,3 +15,6 @@ openssl req -x509 -newkey rsa:2048 -keyout key.pem -out cert.pem -days 3650 -nod
 
 - create service:
 `docker service  create --name imap-2-http-client1 --secret imap-2-http-client1.cfg imap-2-http-connector:latest`
+
+
+$(cd src/main/resources && protoc --python_out=../../../src/main/python/ bytes-message.proto)
